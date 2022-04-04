@@ -30,6 +30,7 @@ file(GLOB PROTOS
 execute_process(COMMAND protoc --proto_path=${PROJECT_SOURCE_DIR}/proto --grpc_out=${PROJECT_SOURCE_DIR}/proto_generation
         --plugin=protoc-gen-grpc=/usr/local/bin/grpc_cpp_plugin --cpp_out=${PROJECT_SOURCE_DIR}/proto_generation ${PROTOS})
 
+# server
 add_executable(server
         ${PROJECT_SOURCE_DIR}/server/server.cpp
         ${PROJECT_SOURCE_DIR}/proto_generation/product.grpc.pb.cc
@@ -51,3 +52,26 @@ target_link_libraries(server
             ${Protobuf_LIBRARIES}
             ${gRPC_REFLECTION_LIBRARIES}
 )
+
+# client
+add_executable(client
+        ${PROJECT_SOURCE_DIR}/client/client.cpp
+        ${PROJECT_SOURCE_DIR}/proto_generation/product.grpc.pb.cc
+        ${PROJECT_SOURCE_DIR}/proto_generation/product.pb.cc
+        )
+
+target_include_directories(client
+        PRIVATE
+        ${Protobuf_INCLUDE_DIRS}
+        ${gRPC_INCLUDE_DIRS}
+        ${fmt_INCLUDE_DIRS}
+        )
+
+target_link_libraries(client
+        PRIVATE
+        fmt::fmt
+        Threads::Threads
+        ${GRPC_LINK_LIBRARIES}
+        ${Protobuf_LIBRARIES}
+        ${gRPC_REFLECTION_LIBRARIES}
+        )

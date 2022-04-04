@@ -24,29 +24,29 @@ public:
     Status addProduct(ServerContext* context, const Product* request, ProductId* response){
         fmt::print("server receives add product call...");
         ProductId id;
-        id.set_value(productId);
+        id.set_value(this->productId);
         Product* product{std::move(const_cast<Product*>(request))};
-        std::cout << "product map ready to emplace back product, product id:" << productId << '\n';
-        productMap.insert(std::make_pair(&id, product));
+        std::cout << "product map ready to emplace back product, product id:" << this->productId << '\n';
+        this->productMap.insert(std::make_pair(&id, product));
         return Status::OK;
     }
 
     Status getProduct(ServerContext* context, const ProductId* request, Product* response){
         fmt::print("server receives get product call...");
         try{
-            Product* product = productMap.at(const_cast<ProductId*>(request));
+            Product* product = this->productMap.at(const_cast<ProductId*>(request));
             response = product;
             return Status::OK;
         }
         catch (const std::out_of_range&) {
             std::cout << "product is not in map..., product id{}" << request->value() << '\n';
+            return Status::CANCELLED;
         }
-        return Status::OK;
     }
 
 private:
-    std::map<ProductId*, Product*> productMap;
-    uint32_t productId;
+    std::map<ProductId*, Product*> productMap{};
+    int32_t productId{0};
 };
 
 void signalHandler(int sig) {
